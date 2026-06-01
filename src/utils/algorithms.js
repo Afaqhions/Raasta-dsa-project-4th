@@ -71,7 +71,7 @@ function dijkstra(start, end, trafficUpdates, considerTraffic = true) {
   pq.push({ dist: 0, node: start });
 
   while (pq.size > 0) {
-    const { dist: currentDist, node: current } = pq.pop();
+    const { node: current } = pq.pop();
 
     if (visited[current]) continue;
     visited[current] = true;

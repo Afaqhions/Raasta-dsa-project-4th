@@ -5,6 +5,11 @@ import { Network } from 'vis-network';
 import { DataSet } from 'vis-data';
 import { Navigation, ArrowRight, Activity, Trash2, Route, GitBranch, AlertTriangle, Search, Menu, X, Loader2, Network as NetworkIcon } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
+import { getGraphJson } from './utils/graphData.js';
+import { dijkstra, findAlternativePaths } from './utils/algorithms.js';
+import { getTrafficJson, getTrafficUpdates, updateTraffic } from './utils/traffic.js';
+
+const initialGraphData = getGraphJson().graph;
 
 // Fix Leaflet icon issue
 const fixLeafletIcon = () => {
@@ -322,7 +327,7 @@ const MapDetailModal = ({ startCoords, endCoords, routePositions, path, onClose 
       map.remove();
       mapInstanceRef.current = null;
     };
-  }, []);
+  }, [endCoords, routePositions, startCoords]);
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
@@ -344,7 +349,7 @@ const MapDetailModal = ({ startCoords, endCoords, routePositions, path, onClose 
 };
 
 // Graph Visualization Modal Component
-const GraphVisualizationModal = ({ graphData, path, startLocation, endLocation, onClose }) => {
+const GraphVisualizationModal = ({ graphData, path, onClose }) => {
   const graphRef = useRef(null);
   const networkRef = useRef(null);
 
@@ -753,14 +758,13 @@ function App() {
   const [estimatedTime, setEstimatedTime] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [statusType, setStatusType] = useState('info');
-  const [backendConnected, setBackendConnected] = useState(false);
+  const [backendConnected] = useState(true);
   const [showToast, setShowToast] = useState(false);
-  const [graphData, setGraphData] = useState(null);
+  const [graphData] = useState(initialGraphData);
   const [trafficRoad, setTrafficRoad] = useState('');
   const [trafficDensity, setTrafficDensity] = useState(50);
   const [updatingTraffic, setUpdatingTraffic] = useState(false);
   const [showDetailedGraph, setShowDetailedGraph] = useState(false);
-  const [showPathOnMap, setShowPathOnMap] = useState(false);
   const [showGraphView, setShowGraphView] = useState(false);
   
   // Show toast helper
@@ -771,40 +775,14 @@ function App() {
     setTimeout(() => setShowToast(false), duration);
   }, []);
   
-  // Fetch locations and graph from backend
+  // Keep traffic data in React state from the local in-memory store.
   useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        const [locRes, graphRes] = await Promise.all([
-          fetch('/api/locations'),
-          fetch('/api/graph')
-        ]);
-        await locRes.json();
-        const graphJson = await graphRes.json();
-        if (graphJson.graph) setGraphData(graphJson.graph);
-        setBackendConnected(true);
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-        setBackendConnected(false);
-        showStatusToast('Backend server not running. Using local data.', 'error', 5000);
-      }
+    const syncTraffic = () => {
+      const data = getTrafficJson();
+      if (data.traffic) setTrafficData(data.traffic);
     };
-    fetchInitialData();
-  }, [showStatusToast]);
-  
-  // Fetch traffic data periodically
-  useEffect(() => {
-    const fetchTraffic = async () => {
-      try {
-        const response = await fetch('/api/traffic');
-        const data = await response.json();
-        if (data.traffic) setTrafficData(data.traffic);
-      } catch {
-        console.error('Failed to fetch traffic');
-      }
-    };
-    fetchTraffic();
-    const interval = setInterval(fetchTraffic, 30000);
+    syncTraffic();
+    const interval = setInterval(syncTraffic, 30000);
     return () => clearInterval(interval);
   }, []);
   
@@ -894,20 +872,23 @@ function App() {
     setLoading(true);
     setRoadDistance(null);
     setAlternativePaths([]);
-    setShowPathOnMap(false);
     if (window.innerWidth < 768) setSidebarOpen(false);
     
     const start = startLocation || findNearestLocation(startCoords[0], startCoords[1]);
     const end = endLocation || findNearestLocation(endCoords[0], endCoords[1]);
     
     try {
-      // Get shortest path
-      const response = await fetch('/api/navigate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ start, end, consider_traffic: considerTraffic })
-      });
-      const data = await response.json();
+      // Calculate shortest path directly in React.
+      const trafficUpdates = getTrafficUpdates();
+      const result = dijkstra(start, end, trafficUpdates, considerTraffic);
+      const data = result.distance === -1
+        ? { error: `No path found between ${start} and ${end}` }
+        : {
+            distance: result.distance,
+            path: result.path,
+            steps: result.path.length,
+            estimated_time: result.distance * 2,
+          };
       
       if (data.error) {
         showStatusToast(data.error, 'error', 5000);
@@ -976,20 +957,22 @@ function App() {
         setRoutePositions(routeCoords.length > 0 ? routeCoords : positions);
         setRoadDistance((totalOSRMDistance / 1000).toFixed(1));
         
-        // Fetch alternative paths
-        const altResponse = await fetch('/api/alternatives', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ start, end, k: 3 })
-        });
-        const altData = await altResponse.json();
+        // Calculate alternative paths directly in React.
+        const altResult = findAlternativePaths(start, end, 3, trafficUpdates);
+        const altData = {
+          paths: altResult.paths.map((p, i) => ({
+            id: i + 1,
+            distance: p.distance,
+            path: p.path,
+          })),
+        };
         if (altData.paths && altData.paths.length > 0) {
           setAlternativePaths(altData.paths);
         }
       }
     } catch (error) {
       console.error('Navigation error:', error);
-      showStatusToast('Failed to calculate route. Please check if the backend is running.', 'error', 5000);
+      showStatusToast('Failed to calculate route.', 'error', 5000);
     }
     
     setLoading(false);
@@ -1010,7 +993,6 @@ function App() {
     setSelectedPath(0);
     setEstimatedTime(null);
     setRoadDistance(null);
-    setShowPathOnMap(false);
     setShowDetailedGraph(false);
     showStatusToast('All selections cleared', 'info', 2000);
   };
@@ -1024,7 +1006,6 @@ function App() {
     setPath([]);
     setDistance(null);
     setRoutePositions([]);
-    setShowPathOnMap(false);
     showStatusToast('Start and destination swapped', 'info', 2000);
   };
   
@@ -1036,22 +1017,12 @@ function App() {
     }
     setUpdatingTraffic(true);
     try {
-      const res = await fetch('/api/traffic', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ road: trafficRoad, density: trafficDensity })
-      });
-      const data = await res.json();
-      if (data.status === 'success') {
-        showStatusToast(`Traffic updated: ${trafficRoad} (${trafficDensity}%)`, 'success');
-        const trafficRes = await fetch('/api/traffic');
-        const trafficJson = await trafficRes.json();
-        if (trafficJson.traffic) setTrafficData(trafficJson.traffic);
-      } else {
-        showStatusToast('Failed to update traffic', 'error');
-      }
+      updateTraffic(trafficRoad, trafficDensity);
+      showStatusToast(`Traffic updated: ${trafficRoad} (${trafficDensity}%)`, 'success');
+      const trafficJson = getTrafficJson();
+      if (trafficJson.traffic) setTrafficData(trafficJson.traffic);
     } catch {
-      showStatusToast('Backend offline', 'error');
+      showStatusToast('Failed to update traffic', 'error');
     }
     setUpdatingTraffic(false);
   };
@@ -1680,8 +1651,6 @@ function App() {
         <GraphVisualizationModal
           graphData={graphData}
           path={path}
-          startLocation={startLocation}
-          endLocation={endLocation}
           onClose={() => setShowGraphView(false)}
         />
       )}

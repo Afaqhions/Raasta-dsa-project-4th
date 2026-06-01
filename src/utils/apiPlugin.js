@@ -1,4 +1,4 @@
-import { getLocationsJson, getGraphJson, getGraph } from "./graphData.js";
+import { getLocationsJson, getGraphJson } from "./graphData.js";
 import { dijkstra, findAlternativePaths } from "./algorithms.js";
 import { getTrafficUpdates, updateTraffic, getTrafficJson } from "./traffic.js";
 
