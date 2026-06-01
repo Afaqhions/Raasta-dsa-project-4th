@@ -110,6 +110,7 @@ input, select, button {
   .app-navbar {
     height: 56px;
     min-height: 56px;
+    z-index: 1010;
   }
 
   .app-main {
@@ -123,12 +124,14 @@ input, select, button {
 
   .app-sidebar-backdrop {
     top: 56px;
+    z-index: 1020;
   }
 
   .app-sidebar {
     top: 56px;
     width: min(92vw, 360px);
     max-width: 92vw;
+    z-index: 1030;
   }
 
   .app-results {
@@ -136,7 +139,7 @@ input, select, button {
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 35;
+    z-index: 1005;
     max-height: min(58dvh, 430px) !important;
     border-top: 1px solid rgba(229, 231, 235, 0.95);
     border-right: 0;

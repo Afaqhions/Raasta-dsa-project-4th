@@ -1061,7 +1061,7 @@ function App() {
     <div className="app-shell h-screen w-full bg-[#f0f2f5] flex flex-col overflow-hidden">
       {/* Toast Notification */}
       <div
-        className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${
+        className={`fixed top-20 left-1/2 -translate-x-1/2 z-[1050] transition-all duration-300 ${
           showToast ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
         }`}
       >
@@ -1078,7 +1078,7 @@ function App() {
       </div>
 
       {/* Top Navbar */}
-      <div className="app-navbar h-12 md:h-14 shrink-0 bg-white border-b border-gray-200/70 flex items-center justify-between px-3 md:px-4 z-30">
+      <div className="app-navbar h-12 md:h-14 shrink-0 bg-white border-b border-gray-200/70 flex items-center justify-between px-3 md:px-4 z-[1010]">
         <div className="flex items-center gap-2 md:gap-3">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -1115,10 +1115,10 @@ function App() {
         {sidebarOpen && (
           <>
             <div 
-              className="app-sidebar-backdrop fixed inset-0 bg-black/40 z-40 md:hidden" 
+              className="app-sidebar-backdrop fixed inset-0 bg-black/40 z-[1020] md:hidden" 
               onClick={() => setSidebarOpen(false)} 
             />
-            <div className="app-sidebar fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white z-50 shadow-2xl flex flex-col md:static md:z-auto md:shadow-none md:w-80 shrink-0 border-r border-gray-200/50">
+            <div className="app-sidebar fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white z-[1030] shadow-2xl flex flex-col md:static md:z-auto md:shadow-none md:w-80 shrink-0 border-r border-gray-200/50">
               <div className="p-4 flex-1 overflow-y-auto overflow-x-hidden">
             {/* Sidebar Header */}
             <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-200/50">
