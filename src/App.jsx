@@ -895,6 +895,7 @@ function App() {
     setRoadDistance(null);
     setAlternativePaths([]);
     setShowPathOnMap(false);
+    if (window.innerWidth < 768) setSidebarOpen(false);
     
     const start = startLocation || findNearestLocation(startCoords[0], startCoords[1]);
     const end = endLocation || findNearestLocation(endCoords[0], endCoords[1]);
@@ -1093,7 +1094,7 @@ function App() {
           showToast ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
         }`}
       >
-        <div className={`px-5 py-3 rounded-none  text-sm font-medium flex items-center gap-2.5 ${
+        <div className={`px-3 md:px-5 py-2 md:py-3 rounded-none text-xs md:text-sm font-medium flex items-center gap-2 ${
           statusType === 'error' ? 'bg-red-500/90 text-white' :
           statusType === 'success' ? 'bg-emerald-500/90 text-white' :
           'bg-gray-900/90 text-white'
@@ -1384,54 +1385,58 @@ function App() {
         
         {/* Results Panel */}
         {distance !== null && distance !== -1 && (
-          <div className="w-full md:w-96 border-b md:border-b-0 md:border-r border-gray-200/50 bg-gray-50 flex flex-col shrink-0 max-h-[45vh] md:max-h-none overflow-y-auto">
+          <div className="w-full md:w-96 border-b md:border-b-0 md:border-r border-gray-200/50 bg-gray-50 flex flex-col shrink-0 max-h-[45vh] md:max-h-none">
+            {/* Mobile drag handle */}
+            <div className="md:hidden flex justify-center py-1.5 bg-gray-100">
+              <div className="w-10 h-1 bg-gray-300 rounded-full" />
+            </div>
             <div className="p-3 md:p-4 flex-1 overflow-y-auto overflow-x-hidden">
               {/* Trip Summary */}
               <div className="animate-slide-in">
-                <div className="bg-white rounded-none p-4 border border-gray-100">
-                  <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">Trip Summary</h3>
-                  <div className="grid grid-cols-2 gap-2.5 mb-3">
-                    <div className="bg-blue-600 rounded-none p-3 text-center">
-                      <span className="text-[9px] font-bold uppercase tracking-wider opacity-75 block">Distance</span>
-                      <p className="text-xl font-black tracking-tight">{distance.toFixed(1)} <span className="text-sm font-medium opacity-75">km</span></p>
+                <div className="bg-white rounded-none p-3 md:p-4 border border-gray-100">
+                  <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2 md:mb-3">Trip Summary</h3>
+                  <div className="grid grid-cols-2 gap-2 md:gap-2.5 mb-2 md:mb-3">
+                    <div className="bg-blue-600 rounded-none p-2 md:p-3 text-center">
+                      <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider opacity-75 block">Distance</span>
+                      <p className="text-lg md:text-xl font-black tracking-tight">{distance.toFixed(1)} <span className="text-xs md:text-sm font-medium opacity-75">km</span></p>
                     </div>
-                    <div className="bg-emerald-600 rounded-none p-3 text-center">
-                      <span className="text-[9px] font-bold uppercase tracking-wider opacity-75 block">Stops</span>
-                      <p className="text-xl font-black tracking-tight">{path.length} <span className="text-sm font-medium opacity-75">nodes</span></p>
+                    <div className="bg-emerald-600 rounded-none p-2 md:p-3 text-center">
+                      <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider opacity-75 block">Stops</span>
+                      <p className="text-lg md:text-xl font-black tracking-tight">{path.length} <span className="text-xs md:text-sm font-medium opacity-75">nodes</span></p>
                     </div>
                   </div>
                   
                   {roadDistance && (
-                    <div className="flex items-center justify-between bg-blue-50 rounded-none px-3 py-2.5 mb-3 border border-blue-100">
-                      <span className="text-xs font-medium text-blue-700">Road Distance</span>
-                      <span className="text-sm font-bold text-blue-700 font-mono">{roadDistance} km</span>
+                    <div className="flex items-center justify-between bg-blue-50 rounded-none px-2 md:px-3 py-2 mb-2 md:mb-3 border border-blue-100">
+                      <span className="text-[11px] md:text-xs font-medium text-blue-700">Road Distance</span>
+                      <span className="text-xs md:text-sm font-bold text-blue-700 font-mono">{roadDistance} km</span>
                     </div>
                   )}
                   
                   {estimatedTime && (
-                    <div className="bg-purple-600 rounded-none p-3 text-center mb-3">
-                      <span className="text-[9px] font-bold uppercase tracking-wider opacity-75 block">Estimated Time</span>
-                      <p className="text-xl font-black tracking-tight">{estimatedTime} <span className="text-sm font-medium opacity-75">min</span></p>
+                    <div className="bg-purple-600 rounded-none p-2 md:p-3 text-center mb-2 md:mb-3">
+                      <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wider opacity-75 block">Estimated Time</span>
+                      <p className="text-lg md:text-xl font-black tracking-tight">{estimatedTime} <span className="text-xs md:text-sm font-medium opacity-75">min</span></p>
                     </div>
                   )}
                   
                   
                   {/* Path Sequence */}
                   <div>
-                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block mb-2">Path Sequence</span>
-                    <div className="space-y-1 max-h-44 overflow-y-auto overflow-x-hidden custom-scrollbar pr-1">
+                    <span className="text-[10px] md:text-[11px] font-bold text-gray-500 uppercase tracking-wider block mb-1.5 md:mb-2">Path Sequence</span>
+                    <div className="space-y-1 max-h-32 md:max-h-44 overflow-y-auto overflow-x-hidden custom-scrollbar pr-1">
                       {path.map((step, i) => (
-                        <div key={i} className="flex items-center gap-2.5 bg-white p-2.5 rounded-none border border-gray-100 hover:border-gray-200 transition-all">
-                          <div className={`w-6 h-6 flex items-center justify-center text-[10px] font-bold rounded-none shrink-0 ${
+                        <div key={i} className="flex items-center gap-2 bg-white p-2 md:p-2.5 rounded-none border border-gray-100 hover:border-gray-200 transition-all">
+                          <div className={`w-5 h-5 md:w-6 md:h-6 flex items-center justify-center text-[9px] md:text-[10px] font-bold rounded-none shrink-0 ${
                             i === 0 ? 'bg-blue-600 text-white' : 
                             i === path.length - 1 ? 'bg-red-500 text-white' : 
                             'bg-gray-200 text-gray-600'
                           }`}>
                             {i + 1}
                           </div>
-                          <span className="text-xs font-medium text-gray-800 leading-tight truncate min-w-0">{step}</span>
+                          <span className="text-[11px] md:text-xs font-medium text-gray-800 leading-tight truncate min-w-0">{step}</span>
                           {i < path.length - 1 && (
-                            <svg className="ml-auto shrink-0 text-gray-300" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            <svg className="ml-auto shrink-0 text-gray-300" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                           )}
                         </div>
                       ))}
@@ -1441,10 +1446,10 @@ function App() {
               </div>
               
               {/* Detailed View & Graph View Buttons */}
-              <div className="grid grid-cols-2 gap-2 mt-4">
+              <div className="grid grid-cols-2 gap-2 mt-3 md:mt-4">
                 <button
                   onClick={() => setShowDetailedGraph(true)}
-                  className="py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider rounded-none flex items-center justify-center gap-2 transition-all"
+                  className="py-2.5 md:py-3 bg-blue-600 hover:bg-blue-700 text-white text-[11px] md:text-xs font-bold uppercase tracking-wider rounded-none flex items-center justify-center gap-1.5 md:gap-2 transition-all"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                   Map View
@@ -1453,7 +1458,7 @@ function App() {
                 <button
                   onClick={() => setShowGraphView(true)}
                   disabled={!graphData}
-                  className="py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-xs font-bold uppercase tracking-wider rounded-none flex items-center justify-center gap-2 transition-all"
+                  className="py-2.5 md:py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-[11px] md:text-xs font-bold uppercase tracking-wider rounded-none flex items-center justify-center gap-1.5 md:gap-2 transition-all"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/><path d="M12 13v4M19 11v4M5 11v4"/></svg>
                   Graph View
@@ -1471,16 +1476,16 @@ function App() {
               
               {/* Alternative Paths */}
               {alternativePaths.length > 1 && (
-                <div className="mt-4 animate-slide-in">
-                  <div className="bg-white rounded-none p-4 border border-gray-100">
-                    <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                      <GitBranch size={12} /> Alternative Routes
+                <div className="mt-3 md:mt-4 animate-slide-in">
+                  <div className="bg-white rounded-none p-3 md:p-4 border border-gray-100">
+                    <h3 className="text-[10px] md:text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 md:mb-2 flex items-center gap-1.5">
+                      <GitBranch size={11} /> Alternative Routes
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-1.5 md:space-y-2">
                       {alternativePaths.slice(1).map((alt, idx) => (
                         <div 
                           key={idx}
-                          className={`p-3 rounded-none cursor-pointer transition-all ${
+                          className={`p-2 md:p-3 rounded-none cursor-pointer transition-all ${
                             selectedPath === idx + 1
                               ? 'border-2 border-purple-500 bg-purple-50/50'
                               : 'border border-gray-200 bg-white hover:border-gray-300'
@@ -1645,14 +1650,14 @@ function App() {
       
       {/* Loading Overlay */}
       {loading && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9998] animate-fade-in" style={{ pointerEvents: 'auto' }}>
-          <div className="bg-white rounded-none p-8 flex flex-col items-center gap-4 animate-slide-in shadow-xl">
-            <Loader2 size={40} className="animate-spin text-blue-600" />
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9998] animate-fade-in px-4" style={{ pointerEvents: 'auto' }}>
+          <div className="bg-white rounded-none p-6 md:p-8 flex flex-col items-center gap-3 md:gap-4 animate-slide-in shadow-xl max-w-[90vw]">
+            <Loader2 size={36} className="animate-spin text-blue-600 md:w-10 md:h-10" />
             <div className="text-center">
-              <p className="text-sm font-bold text-gray-900">Calculating Optimal Route</p>
-              <p className="text-xs text-gray-500 mt-0.5">Running Dijkstra's algorithm...</p>
+              <p className="text-xs md:text-sm font-bold text-gray-900">Calculating Optimal Route</p>
+              <p className="text-[10px] md:text-xs text-gray-500 mt-0.5">Running Dijkstra's algorithm...</p>
             </div>
-            <div className="w-40 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+            <div className="w-32 md:w-40 h-1.5 bg-gray-200 rounded-full overflow-hidden">
               <div className="h-full bg-blue-600 rounded-full" style={{ width: '60%', animation: 'pulse 1s infinite' }} />
             </div>
           </div>
