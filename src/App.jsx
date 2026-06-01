@@ -1058,7 +1058,7 @@ function App() {
   };
   
   return (
-    <div className="h-screen w-full bg-[#f0f2f5] flex flex-col overflow-hidden">
+    <div className="app-shell h-screen w-full bg-[#f0f2f5] flex flex-col overflow-hidden">
       {/* Toast Notification */}
       <div
         className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${
@@ -1078,7 +1078,7 @@ function App() {
       </div>
 
       {/* Top Navbar */}
-      <div className="h-12 md:h-14 shrink-0 bg-white border-b border-gray-200/70 flex items-center justify-between px-3 md:px-4 z-30">
+      <div className="app-navbar h-12 md:h-14 shrink-0 bg-white border-b border-gray-200/70 flex items-center justify-between px-3 md:px-4 z-30">
         <div className="flex items-center gap-2 md:gap-3">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -1110,15 +1110,15 @@ function App() {
       </div>
 
       {/* Main content area */}
-      <div className="flex flex-col md:flex-row flex-1 overflow-hidden relative">
+      <div className="app-main flex flex-col md:flex-row flex-1 overflow-hidden relative">
         {/* Sidebar - overlay on mobile, inline on desktop */}
         {sidebarOpen && (
           <>
             <div 
-              className="fixed inset-0 bg-black/40 z-40 md:hidden" 
+              className="app-sidebar-backdrop fixed inset-0 bg-black/40 z-40 md:hidden" 
               onClick={() => setSidebarOpen(false)} 
             />
-            <div className="fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white z-50 shadow-2xl flex flex-col md:static md:z-auto md:shadow-none md:w-80 shrink-0 border-r border-gray-200/50">
+            <div className="app-sidebar fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white z-50 shadow-2xl flex flex-col md:static md:z-auto md:shadow-none md:w-80 shrink-0 border-r border-gray-200/50">
               <div className="p-4 flex-1 overflow-y-auto overflow-x-hidden">
             {/* Sidebar Header */}
             <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-200/50">
@@ -1356,7 +1356,7 @@ function App() {
         
         {/* Results Panel */}
         {distance !== null && distance !== -1 && (
-          <div className="w-full md:w-96 border-b md:border-b-0 md:border-r border-gray-200/50 bg-gray-50 flex flex-col shrink-0 max-h-[45vh] md:max-h-none">
+          <div className="app-results w-full md:w-96 border-b md:border-b-0 md:border-r border-gray-200/50 bg-gray-50 flex flex-col shrink-0 max-h-[45vh] md:max-h-none">
             {/* Mobile drag handle */}
             <div className="md:hidden flex justify-center py-1.5 bg-gray-100">
               <div className="w-10 h-1 bg-gray-300 rounded-full" />
@@ -1493,7 +1493,7 @@ function App() {
         )}
         
         {/* Main Map Area */}
-        <div className="flex-1 relative">
+        <div className="app-map flex-1 relative">
           <div className="absolute inset-0">
             <MapContainer 
               center={lahoreCenter} 

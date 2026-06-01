@@ -19,12 +19,15 @@ body {
   padding: 0;
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: #f0f2f5;
+  overflow: hidden;
 }
 
 #root {
   width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 ::-webkit-scrollbar {
@@ -100,6 +103,55 @@ input, select, button {
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
+  .app-shell {
+    height: 100dvh;
+  }
+
+  .app-navbar {
+    height: 56px;
+    min-height: 56px;
+  }
+
+  .app-main {
+    min-height: 0;
+  }
+
+  .app-map {
+    min-height: 0;
+    height: calc(100dvh - 56px);
+  }
+
+  .app-sidebar-backdrop {
+    top: 56px;
+  }
+
+  .app-sidebar {
+    top: 56px;
+    width: min(92vw, 360px);
+    max-width: 92vw;
+  }
+
+  .app-results {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 35;
+    max-height: min(58dvh, 430px) !important;
+    border-top: 1px solid rgba(229, 231, 235, 0.95);
+    border-right: 0;
+    box-shadow: 0 -18px 48px rgba(15, 23, 42, 0.18);
+  }
+
+  .app-results > div:last-child {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .leaflet-bottom.leaflet-left,
+  .leaflet-bottom.leaflet-right {
+    bottom: calc(min(58dvh, 430px) + 8px);
+  }
+
   .graph-legend {
     font-size: 10px !important;
     padding: 12px !important;
@@ -107,12 +159,30 @@ input, select, button {
   }
   
   .leaflet-control-zoom {
-    margin-top: 60px !important;
+    margin-top: 12px !important;
   }
   
   .vis-navigation.button {
     width: 32px !important;
     height: 32px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-navbar h1 {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .app-results {
+    max-height: min(62dvh, 455px) !important;
+  }
+
+  .leaflet-bottom.leaflet-left,
+  .leaflet-bottom.leaflet-right {
+    bottom: calc(min(62dvh, 455px) + 8px);
   }
 }
 
