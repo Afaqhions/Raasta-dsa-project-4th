@@ -776,8 +776,8 @@ function App() {
     const fetchInitialData = async () => {
       try {
         const [locRes, graphRes] = await Promise.all([
-          fetch('http://localhost:18080/api/locations'),
-          fetch('http://localhost:18080/api/graph')
+          fetch('/api/locations'),
+          fetch('/api/graph')
         ]);
         await locRes.json();
         const graphJson = await graphRes.json();
@@ -796,7 +796,7 @@ function App() {
   useEffect(() => {
     const fetchTraffic = async () => {
       try {
-        const response = await fetch('http://localhost:18080/api/traffic');
+        const response = await fetch('/api/traffic');
         const data = await response.json();
         if (data.traffic) setTrafficData(data.traffic);
       } catch {
@@ -902,7 +902,7 @@ function App() {
     
     try {
       // Get shortest path
-      const response = await fetch('http://localhost:18080/api/navigate', {
+      const response = await fetch('/api/navigate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ start, end, consider_traffic: considerTraffic })
@@ -977,7 +977,7 @@ function App() {
         setRoadDistance((totalOSRMDistance / 1000).toFixed(1));
         
         // Fetch alternative paths
-        const altResponse = await fetch('http://localhost:18080/api/alternatives', {
+        const altResponse = await fetch('/api/alternatives', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ start, end, k: 3 })
@@ -1036,7 +1036,7 @@ function App() {
     }
     setUpdatingTraffic(true);
     try {
-      const res = await fetch('http://localhost:18080/api/traffic', {
+      const res = await fetch('/api/traffic', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ road: trafficRoad, density: trafficDensity })
@@ -1044,7 +1044,7 @@ function App() {
       const data = await res.json();
       if (data.status === 'success') {
         showStatusToast(`Traffic updated: ${trafficRoad} (${trafficDensity}%)`, 'success');
-        const trafficRes = await fetch('http://localhost:18080/api/traffic');
+        const trafficRes = await fetch('/api/traffic');
         const trafficJson = await trafficRes.json();
         if (trafficJson.traffic) setTrafficData(trafficJson.traffic);
       } else {
